@@ -55,8 +55,13 @@ UKF::UKF()
     weights_.fill(0.5 / (lambda_ + n_aug_));
     weights_(0) = lambda_ / (lambda_ + n_aug_);
 
+    // store X k+1|k
     Xsig_pred_ = MatrixXd(n_x_, 2 * n_aug_ + 1);
+
+    // store x k+1|k
     x_pred_ = VectorXd(5);
+
+    // store P k+1|k
     P_pred_ = MatrixXd(5, 5);
 
     R_radar_ = MatrixXd(3, 3);
@@ -79,7 +84,6 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package)
 {
     if (!is_initialized_)
     {
-
         // first measurement
         cout << "UKF: " << endl;
 
@@ -127,11 +131,11 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package)
     SigmaPointPrediction(dt);
     PredictMeanAndCovariance();
 
-    if (meas_package.sensor_type_ == MeasurementPackage::RADAR)
+    if (meas_package.sensor_type_ == MeasurementPackage::RADAR && use_radar_)
     {
         UpdateRadar(meas_package);
     }
-    else
+    else if (meas_package.sensor_type_ == MeasurementPackage::LASER && use_laser_)
     {
         UpdateLidar(meas_package);
     }
@@ -240,7 +244,6 @@ void UKF::PredictMeanAndCovariance()
             x_diff(3) -= 2. * M_PI;
         while (x_diff(3) < -M_PI)
             x_diff(3) += 2. * M_PI;
-
         P_pred_ = P_pred_ + weights_(i) * x_diff * x_diff.transpose();
     }
 }

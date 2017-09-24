@@ -31,10 +31,10 @@ class UKF
     ///* predicted sigma points matrix
     MatrixXd Xsig_pred_;
 
-    //* predicted x k|k+1
+    //* predicted x k+1|k
     VectorXd x_pred_;
 
-    //* predicted state covariance P k|k+1
+    //* predicted state covariance P k+1|k
     MatrixXd P_pred_;
 
 
